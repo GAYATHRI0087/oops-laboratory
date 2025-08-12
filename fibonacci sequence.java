@@ -26,10 +26,8 @@ OUTPUT:
 0 1 1 2 3
 
 TEST CASE 2:
-package exercise;
-
-public class Fibonacci {
-
+public class Fibonacci 
+{
     
     public static int fib(int n) {
         if (n == 0)
@@ -52,12 +50,9 @@ OUTPUT:
 0 1 1 2 3 5 8
 
 TEST CASE 3 :
-package exercise;
-
-public class Fibonacci {
-
-    
-    public static int fib(int n) {
+public class Fibonacci 
+{
+  public static int fib(int n) {
         if (n == 0)
             return 0;
         else if (n == 1)
@@ -80,12 +75,9 @@ OUTPUT:
 
 
 TEST CASE 4:
-package exercise;
-
-public class Fibonacci {
-
-    
-    public static int fib(int n) {
+public class Fibonacci
+  {
+ public static int fib(int n) {
         if (n == 0)
             return 0;
         else if (n == 1)
@@ -107,7 +99,6 @@ OUTPUT:
 (no output)
 
 TEST CASE 5:
-package exercise;
 
 public class Fibonacci {
 
