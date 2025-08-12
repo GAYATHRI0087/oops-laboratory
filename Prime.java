@@ -107,7 +107,7 @@ OUTPUT:
   TEST CASE 5:
         public class Prime{
     public static void main(String[] args) {
-        int n=17;
+        int n=0;
         boolean isPrime=true;
         if(n<=1){
             isPrime=false;
