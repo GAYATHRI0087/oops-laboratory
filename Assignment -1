@@ -1,0 +1,90 @@
+//Gayathri P
+//2117240070087
+
+
+package module;
+
+class SmartDevice {
+    private String deviceName;
+    private boolean status;  // true = ON, false = OFF
+
+    // Constructor
+    public SmartDevice(String deviceName) {
+        this.deviceName = deviceName;
+        this.status = false; // default OFF
+    }
+
+    // Getter for deviceName
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    // Getter for status
+    public boolean isOn() {
+        return status;
+    }
+
+    // Setter for status
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    // Method to toggle device status
+    public void toggleStatus() {
+        status = !status;
+        System.out.println(deviceName + " is now " + (status ? "ON" : "OFF"));
+    }
+
+    // Method to display device info (can be overridden)
+    public void deviceInfo() {
+        System.out.println("Device: " + deviceName + ", Status: " + (status ? "ON" : "OFF"));
+    }
+}
+
+// Derived class - SmartLight
+class SmartLight extends SmartDevice {
+    public SmartLight(String name) {
+        super(name);
+    }
+
+    @Override
+    public void deviceInfo() {
+        System.out.println("Smart Light -> Name: " + getDeviceName() + ", Status: " + (isOn() ? "ON" : "OFF"));
+    }
+}
+
+// Derived class - SmartFan
+class SmartFan extends SmartDevice {
+    public SmartFan(String name) {
+        super(name);
+    }
+
+    @Override
+    public void deviceInfo() {
+        System.out.println("Smart Fan -> Name: " + getDeviceName() + ", Status: " + (isOn() ? "ON" : "OFF"));
+    }
+}
+
+// Main class
+public class SmartHomeDemo {
+    public static void main(String[] args) {
+        SmartLight light = new SmartLight("Living Room Light");
+        SmartFan fan = new SmartFan("Bedroom Fan");
+
+        light.deviceInfo();
+        fan.deviceInfo();
+
+        // Turn ON devices
+        light.setStatus(true);
+        fan.toggleStatus();
+
+        light.deviceInfo();
+        fan.deviceInfo();
+    }
+Output:
+Smart Light -> Name: Living Room Light, Status: OFF
+Smart Fan -> Name: Bedroom Fan, Status: OFF
+Bedroom Fan is now ON
+Smart Light -> Name: Living Room Light, Status: ON
+Smart Fan -> Name: Bedroom Fan, Status: ON
+}
