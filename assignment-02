@@ -1,0 +1,30 @@
+//gayathri.p
+//2117240070087
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class BufferedReaderExample {
+    public static void main(String[] args) {
+        String fileName = "sample.txt"; // Change to your file path
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            int lineNumber = 1;
+
+            while ((line = br.readLine()) != null) {
+                System.out.println(lineNumber + ": " + line);
+                lineNumber++;
+            }
+
+        } catch (IOException e) {
+            System.out.println("An error occurred while reading the file.");
+            e.printStackTrace();
+        }
+    }
+}
+output:
+an error occurred while reading the file
+java.io filenotfoundexception: sample.txt(the system cannot find the file specified)
+at java.base/java.io.fileinputstream.openo(native method)
