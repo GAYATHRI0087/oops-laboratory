@@ -1,0 +1,67 @@
+//Gayathri P
+//2117240070087
+
+
+PROGRAM:
+import java.util.concurrent.CyclicBarrier;
+
+class ParallelSum {
+    private static final int NUM_THREADS = 4;
+    private static int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    private static int[] partialSums = new int[NUM_THREADS];
+    private static int finalSum = 0;
+
+    public static void main(String[] args) throws Exception {
+        int chunkSize = numbers.length / NUM_THREADS;
+
+        // Barrier action: executed once all threads reach the barrier
+        CyclicBarrier barrier = new CyclicBarrier(NUM_THREADS, () -> {
+            for (int sum : partialSums) {
+                finalSum += sum;
+            }
+            System.out.println("Final Sum = " + finalSum);
+        });
+
+        // Create and start threads
+        for (int i = 0; i < NUM_THREADS; i++) {
+            int start = i * chunkSize;
+            int end = (i == NUM_THREADS - 1) ? numbers.length : start + chunkSize;
+            new Thread(new Worker(i, start, end, barrier)).start();
+        }
+    }
+
+    static class Worker implements Runnable {
+        private int id, start, end;
+        private CyclicBarrier barrier;
+
+        Worker(int id, int start, int end, CyclicBarrier barrier) {
+            this.id = id;
+            this.start = start;
+            this.end = end;
+            this.barrier = barrier;
+        }
+
+        @Override
+        public void run() {
+            int sum = 0;
+            for (int i = start; i < end; i++) {
+                sum += numbers[i];
+            }
+            partialSums[id] = sum;
+            System.out.println("Thread " + id + " partial sum = " + sum);
+
+            try {
+                barrier.await(); // wait at the barrier
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+OUTPUT:
+Thread 0 partial sum = 10
+Thread 1 partial sum = 26
+Thread 2 partial sum = 42
+Thread 3 partial sum = 30
+Final Sum = 108
