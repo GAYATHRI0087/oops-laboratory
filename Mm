@@ -1,0 +1,151 @@
+//Gayathri P
+//2117240070087
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class FoodServer {
+    // Menu data
+    private static Map<Integer, String> menu = new HashMap<>();
+    private static Map<Integer, Double> prices = new HashMap<>();
+    private static Map<String, String> orders = new HashMap<>();
+
+    public static void main(String[] args) {
+        // Initialize menu
+        menu.put(1, "Pizza");
+        menu.put(2, "Burger");
+        menu.put(3, "Pasta");
+        menu.put(4, "Salad");
+
+        prices.put(1, 8.99);
+        prices.put(2, 5.49);
+        prices.put(3, 7.29);
+        prices.put(4, 4.99);
+
+        try (ServerSocket serverSocket = new ServerSocket(5000)) {
+            System.out.println(" Food Delivery Server started on port 5000...");
+
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Client connected: " + clientSocket.getInetAddress());
+                new ClientHandler(clientSocket).start();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static class ClientHandler extends Thread {
+        private Socket socket;
+        private BufferedReader in;
+        private PrintWriter out;
+
+        public ClientHandler(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            try {
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                out = new PrintWriter(socket.getOutputStream(), true);
+
+                out.println("Welcome to the Food Delivery System!");
+                out.println("Commands:");
+                out.println("MENU - show menu");
+                out.println("ORDER <item_number> - place order");
+                out.println("STATUS - check order");
+                out.println("QUIT - exit");
+
+                String inputLine;
+                String clientKey = socket.getInetAddress().toString();
+
+                while ((inputLine = in.readLine()) != null) {
+                    inputLine = inputLine.trim().toUpperCase();
+
+                    if (inputLine.equals("MENU")) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("---- MENU ----\n");
+                        for (int id : menu.keySet()) {
+                            sb.append(id).append(". ").append(menu.get(id))
+                              .append(" - $").append(prices.get(id)).append("\n");
+                        }
+                        out.println(sb.toString());
+
+                    } else if (inputLine.startsWith("ORDER")) {
+                        try {
+                            String[] parts = inputLine.split(" ");
+                            int itemId = Integer.parseInt(parts[1]);
+                            if (menu.containsKey(itemId)) {
+                                orders.put(clientKey, menu.get(itemId));
+                                out.println("You ordered " + menu.get(itemId) + ". Preparing your food...");
+                            } else {
+                                out.println("Invalid item number.");
+                            }
+                        } catch (Exception e) {
+                            out.println("Usage: ORDER <item_number>");
+                        }
+
+                    } else if (inputLine.equals("STATUS")) {
+                        if (orders.containsKey(clientKey)) {
+                            out.println("Your " + orders.get(clientKey) + " is out for delivery!");
+                        } else {
+                            out.println("You have no active orders.");
+                        }
+
+                    } else if (inputLine.equals("QUIT")) {
+                        out.println("Goodbye! Thank you for ordering.");
+                        break;
+
+                    } else {
+                        out.println("Unknown command.");
+                    }
+                }
+
+                socket.close();
+                System.out.println("Client disconnected: " + socket.getInetAddress());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+import java.io.*;
+import java.net.*;
+
+public class FoodClient {
+    public static void main(String[] args) {
+        try (Socket socket = new Socket("localhost", 5000);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in))) {
+
+            String fromServer;
+            while ((fromServer = in.readLine()) != null && !fromServer.isEmpty()) {
+                System.out.println(fromServer);
+                if (!in.ready()) break; // stop printing welcome lines
+            }
+
+            String inputLine;
+            while (true) {
+                System.out.print("Enter command: ");
+                inputLine = userInput.readLine();
+                if (inputLine == null) break;
+
+                out.println(inputLine);
+
+                String response;
+                while (in.ready()) {
+                    response = in.readLine();
+                    System.out.println(response);
+                }
+
+                if (inputLine.trim().equalsIgnoreCase("QUIT")) break;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
