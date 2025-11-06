@@ -1,0 +1,99 @@
+//Gayathri P
+//2117240070087
+//phase 1
+import socket
+import threading
+
+# Menu data
+menu = {
+    1: ("Pizza", 8.99),
+    2: ("Burger", 5.49),
+    3: ("Pasta", 7.29),
+    4: ("Salad", 4.99)
+}
+
+orders = {}  # store orders per client address
+
+
+def handle_client(conn, addr):
+    conn.sendall(b"Welcome to the Food Delivery System!\n")
+    conn.sendall(b"Commands:\nMENU - show menu\nORDER <item_number> - place order\nSTATUS - check order\nQUIT - exit\n")
+
+    while True:
+        data = conn.recv(1024).decode().strip()
+        if not data:
+            break
+
+        if data.upper() == "MENU":
+            response = "\n---- MENU ----\n"
+            for item_id, (name, price) in menu.items():
+                response += f"{item_id}. {name} - ${price:.2f}\n"
+            conn.sendall(response.encode())
+
+        elif data.upper().startswith("ORDER"):
+            try:
+                _, item_id = data.split()
+                item_id = int(item_id)
+                if item_id in menu:
+                    orders[addr] = menu[item_id][0]
+                    conn.sendall(f"You ordered {menu[item_id][0]}. Preparing your food...\n".encode())
+                else:
+                    conn.sendall(b"Invalid item number.\n")
+            except:
+                conn.sendall(b"Usage: ORDER <item_number>\n")
+
+        elif data.upper() == "STATUS":
+            if addr in orders:
+                conn.sendall(f"Your {orders[addr]} is out for delivery!\n".encode())
+            else:
+                conn.sendall(b"You have no active orders.\n")
+
+        elif data.upper() == "QUIT":
+            conn.sendall(b"Goodbye! Thank you for ordering.\n")
+            break
+
+        else:
+            conn.sendall(b"Unknown command.\n")
+
+    conn.close()
+    print(f"Client {addr} disconnected.")
+
+
+def main():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('localhost', 5000))
+    server.listen(5)
+    print("Server started on port 5000...")
+
+    while True:
+        conn, addr = server.accept()
+        print(f"Connected by {addr}")
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+
+
+if __name__ == "__main__":
+    main()
+import socket
+
+def main():
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(('localhost', 5000))
+
+    print(client.recv(1024).decode())  # welcome message
+
+    while True:
+        msg = input("Enter command: ").strip()
+        client.sendall(msg.encode())
+
+        if msg.upper() == "QUIT":
+            print(client.recv(1024).decode())
+            break
+
+        response = client.recv(4096).decode()
+        print(response)
+
+    client.close()
+
+if __name__ == "__main__":
+    main()
